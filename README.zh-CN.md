@@ -2,7 +2,7 @@
 
 **同一批信息，由你选择观察视角。**
 
-简体中文 | [English](README.md)
+[English](README.md) | 简体中文
 
 Refetch Core 是一个开放、可移植的用户可控语义信息流引擎。它把 GitHub、RSS 和内容平台等来源转换为统一表达，再按照用户主动选择的 **Lens（信息视角）** 组织内容。
 
