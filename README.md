@@ -2,7 +2,7 @@
 
 **See the same information through the lens you choose.**
 
-[English]|[简体中文](README.zh-CN.md)
+English | [简体中文](README.zh-CN.md)
 
 Refetch Core is an open, portable engine for building user-directed semantic feeds. It turns content from sources such as GitHub, RSS, and media platforms into a shared representation, then organizes that content through an explicit **Lens** selected by the user.
 
