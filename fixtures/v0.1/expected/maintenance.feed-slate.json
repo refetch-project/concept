@@ -1,6 +1,9 @@
 {
   "specVersion": "v0.1",
+  "requestId": "req:foundation-v012",
+  "lensId": "lens:maintenance",
   "generatedAt": "2026-01-15T00:00:00Z",
+  "algorithmId": "refetch.rank.baseline.v0.1",
   "items": [
     {
       "candidateId": "cand:migration",

@@ -1,10 +1,12 @@
 # Refetch Concept
 
+[简体中文](README.zh-CN.md)
+
 Refetch Concept is the language-neutral source of truth for Refetch: an open, portable foundation for user-directed semantic feeds. It defines the terminology, RFCs, JSON Schema, and conformance fixtures that implementations use to produce explainable `FeedSlate` results.
 
 The Rust reference implementation lives in [`refetch-project/core-rust`](https://github.com/refetch-project/core-rust). Rust structs are bindings to this repository's schemas and fixtures; they are not the specification source.
 
-> **Project stage:** Foundation v0.1.1. The v0.1 contract is a draft, executable specification for deterministic feed ranking and slate selection.
+> **Project stage:** Foundation v0.1.2. The v0.1 contract is a draft, executable specification for deterministic feed ranking and slate selection.
 
 ## What Refetch enables
 

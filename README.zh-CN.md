@@ -1,10 +1,12 @@
 # Refetch Concept
 
+[English](README.md)
+
 Refetch Concept 是 Refetch 的语言无关规范源。它定义术语、RFC、JSON Schema 和一致性 fixtures，帮助不同实现生成可解释的 `FeedSlate`。
 
 Rust 参考实现位于 [`refetch-project/core-rust`](https://github.com/refetch-project/core-rust)。Rust struct 是本仓库 Schema 与 fixtures 的 binding，不是反向定义规范的来源。
 
-> **项目阶段：** Foundation v0.1.1。v0.1 契约是一个草案状态的、可执行的确定性 feed 排序与列表选择规范。
+> **项目阶段：** Foundation v0.1.2。v0.1 契约是一个草案状态的、可执行的确定性 feed 排序与列表选择规范。
 
 ## Refetch 能带来什么
 

@@ -1,7 +1,7 @@
 {
-  "expectedError": "schema",
+  "expectedError": "duplicateCandidateSignalName",
   "request": {
-    "specVersion": "v9",
+    "specVersion": "v0.1",
     "id": "req:foundation-v012",
     "context": {
       "generatedAt": "2026-01-15T00:00:00Z"
@@ -41,6 +41,13 @@
           }
         ],
         "signals": [
+          {
+            "name": "source.activity",
+            "value": 0.7,
+            "evidenceRefs": [
+              "ev:cand:release:src"
+            ]
+          },
           {
             "name": "source.activity",
             "value": 0.7,

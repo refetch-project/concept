@@ -1,7 +1,7 @@
 {
-  "expectedError": "schema",
+  "expectedError": "duplicateAnalysisSignalName",
   "request": {
-    "specVersion": "v9",
+    "specVersion": "v0.1",
     "id": "req:foundation-v012",
     "context": {
       "generatedAt": "2026-01-15T00:00:00Z"
@@ -215,6 +215,13 @@
           {
             "name": "analysis.operationalRisk",
             "value": -0.2,
+            "evidenceRefs": [
+              "ev:cand:release:analysis"
+            ]
+          },
+          {
+            "name": "analysis.productionReadiness",
+            "value": 0.9,
             "evidenceRefs": [
               "ev:cand:release:analysis"
             ]

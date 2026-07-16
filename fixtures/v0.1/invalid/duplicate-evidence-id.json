@@ -2,6 +2,7 @@
   "expectedError": "duplicateEvidenceId",
   "request": {
     "specVersion": "v0.1",
+    "id": "req:foundation-v012",
     "context": {
       "generatedAt": "2026-01-15T00:00:00Z"
     },
@@ -14,7 +15,8 @@
           "name": "github"
         },
         "subject": {
-          "type": "release",
+          "id": "subj:release",
+          "type": "software.release",
           "title": "Stable release",
           "url": "https://example.com/cand:release"
         },
@@ -24,6 +26,10 @@
         },
         "provenance": {
           "retrievedAt": "2026-01-14T01:00:00Z",
+          "adapter": {
+            "name": "fixture-adapter",
+            "version": "0.1.0"
+          },
           "author": "Refetch Fixture"
         },
         "evidence": [
@@ -58,16 +64,21 @@
           "name": "github"
         },
         "subject": {
-          "type": "release",
+          "id": "subj:migration",
+          "type": "software.issue",
           "title": "Migration issue",
           "url": "https://example.com/cand:migration"
         },
         "trigger": {
-          "type": "released",
+          "type": "updated",
           "observedAt": "2026-01-14T00:00:00Z"
         },
         "provenance": {
           "retrievedAt": "2026-01-14T01:00:00Z",
+          "adapter": {
+            "name": "fixture-adapter",
+            "version": "0.1.0"
+          },
           "author": "Refetch Fixture"
         },
         "evidence": [
@@ -96,6 +107,7 @@
           "name": "rss"
         },
         "subject": {
+          "id": "subj:paper",
           "type": "article",
           "title": "Frontier article",
           "url": "https://example.com/cand:paper"
@@ -106,6 +118,10 @@
         },
         "provenance": {
           "retrievedAt": "2026-01-14T01:00:00Z",
+          "adapter": {
+            "name": "fixture-adapter",
+            "version": "0.1.0"
+          },
           "author": "Refetch Fixture"
         },
         "evidence": [
@@ -134,6 +150,7 @@
           "name": "rss"
         },
         "subject": {
+          "id": "subj:ops",
           "type": "article",
           "title": "Ops article",
           "url": "https://example.com/cand:ops"
@@ -144,6 +161,10 @@
         },
         "provenance": {
           "retrievedAt": "2026-01-14T01:00:00Z",
+          "adapter": {
+            "name": "fixture-adapter",
+            "version": "0.1.0"
+          },
           "author": "Refetch Fixture"
         },
         "evidence": [
@@ -170,6 +191,11 @@
         "specVersion": "v0.1",
         "id": "ana:release",
         "candidateId": "cand:release",
+        "analyzer": {
+          "name": "fixture-analyzer",
+          "version": "0.1.0"
+        },
+        "createdAt": "2026-01-14T02:00:00Z",
         "evidence": [
           {
             "id": "ev:cand:release:analysis",
@@ -200,20 +226,23 @@
             ]
           }
         ],
-        "clusterAssignments": [
-          {
-            "namespace": "topic-event",
-            "id": "flutter-release",
-            "evidenceRefs": [
-              "ev:cand:release:analysis"
-            ]
-          }
-        ]
+        "clusterAssignment": {
+          "namespace": "topic-event",
+          "id": "flutter-release",
+          "evidenceRefs": [
+            "ev:cand:release:analysis"
+          ]
+        }
       },
       {
         "specVersion": "v0.1",
         "id": "ana:migration",
         "candidateId": "cand:migration",
+        "analyzer": {
+          "name": "fixture-analyzer",
+          "version": "0.1.0"
+        },
+        "createdAt": "2026-01-14T02:00:00Z",
         "evidence": [
           {
             "id": "ev:cand:migration:analysis",
@@ -244,20 +273,23 @@
             ]
           }
         ],
-        "clusterAssignments": [
-          {
-            "namespace": "topic-event",
-            "id": "flutter-release",
-            "evidenceRefs": [
-              "ev:cand:migration:analysis"
-            ]
-          }
-        ]
+        "clusterAssignment": {
+          "namespace": "topic-event",
+          "id": "flutter-release",
+          "evidenceRefs": [
+            "ev:cand:migration:analysis"
+          ]
+        }
       },
       {
         "specVersion": "v0.1",
         "id": "ana:paper",
         "candidateId": "cand:paper",
+        "analyzer": {
+          "name": "fixture-analyzer",
+          "version": "0.1.0"
+        },
+        "createdAt": "2026-01-14T02:00:00Z",
         "evidence": [
           {
             "id": "ev:cand:paper:analysis",
@@ -293,6 +325,11 @@
         "specVersion": "v0.1",
         "id": "ana:ops",
         "candidateId": "cand:ops",
+        "analyzer": {
+          "name": "fixture-analyzer",
+          "version": "0.1.0"
+        },
+        "createdAt": "2026-01-14T02:00:00Z",
         "evidence": [
           {
             "id": "ev:cand:ops:analysis",
@@ -323,15 +360,13 @@
             ]
           }
         ],
-        "clusterAssignments": [
-          {
-            "namespace": "topic-event",
-            "id": "ops-guidance",
-            "evidenceRefs": [
-              "ev:cand:ops:analysis"
-            ]
-          }
-        ]
+        "clusterAssignment": {
+          "namespace": "topic-event",
+          "id": "ops-guidance",
+          "evidenceRefs": [
+            "ev:cand:ops:analysis"
+          ]
+        }
       }
     ],
     "lens": {
