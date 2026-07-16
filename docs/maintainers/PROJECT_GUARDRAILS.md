@@ -210,3 +210,7 @@ Feed Lab 应首先成为维护者自己的真实工具。
 ## 10. 维护方式
 
 本文随关键设计决策更新。调整范围预算、验证门槛或停止条件时，应在提交中说明依据，避免在结果不理想时悄悄移动判断标准。
+
+## Foundation v0.1.1 guardrail
+
+`concept` is the normative source for language-neutral schema and fixtures. Reference implementations must not add hidden semantics that are absent from RFC 0001 and the v0.1 schemas.
