@@ -1,183 +1,75 @@
-# Refetch Core
+# Refetch Concept
 
-**See the same information through the lens you choose.**
+[简体中文](README.zh-CN.md)
 
-English | [简体中文](README.zh-CN.md)
+Refetch Concept is the language-neutral source of truth for Refetch: an open, portable foundation for user-directed semantic feeds. It defines the terminology, RFCs, JSON Schema, and conformance fixtures that implementations use to produce explainable `FeedSlate` results.
 
-Refetch Core is an open, portable engine for building user-directed semantic feeds. It turns content from sources such as GitHub, RSS, and media platforms into a shared representation, then organizes that content through an explicit **Lens** selected by the user.
+The Rust reference implementation lives in [`refetch-project/core-rust`](https://github.com/refetch-project/core-rust). Rust structs are bindings to this repository's schemas and fixtures; they are not the specification source.
 
-The result is a feed that can answer three useful questions for every item:
+> **Project stage:** Foundation v0.1.3. The v0.1 contract is a draft, executable specification for deterministic feed ranking and slate selection.
 
-- Why is this here?
-- Why is it ranked here?
-- Which evidence and rules shaped the decision?
+## What Refetch enables
 
-> **Project stage:** foundation. The contract, fixtures, and Dart reference engine are being designed in public.
-
-## One source, many useful views
-
-A platform usually presents one dominant ordering: recent, trending, popular, or personalized. Refetch lets the same candidate pool support multiple task-oriented views.
+Refetch lets the same pool of information be reorganized through an explicit **Lens** chosen for the user's current task.
 
 | Lens | What rises to the top |
 | --- | --- |
-| Production readiness | Stable releases, active maintenance, clear migration notes, and ecosystem compatibility |
-| Frontier watch | New approaches, unusual architecture, fast-moving discussions, and emerging projects |
-| Contribution opportunities | Well-scoped issues, maintainer activity, newcomer guidance, and projects matching your skills |
-| Learning path | Foundational material, practical examples, and concepts arranged by dependency and difficulty |
+| Production readiness | stable releases, migration notes, operational risk, compatibility |
+| Frontier watch | new techniques, unusual experiments, early research signals |
+| Maintenance triage | regressions, security fixes, dependency churn, high-impact issues |
 
-For example, a GitHub release might appear like this under a production-readiness Lens:
+For example, a GitHub release and an RSS article can both be represented as `FeedCandidate` objects. Under a production-readiness Lens, the release may rank highly because its signals show stable adoption and migration evidence. Under a frontier Lens, the RSS article may rank higher because analysis signals show novelty and active technical discussion. The source material stays the same; the selected Lens changes the ranking policy and explanations.
 
-```text
-Repository release · ranked #2
+## Repository boundary
 
-Summary
-A stable release improves desktop support and documents the migration path.
+This repository contains:
 
-Why it is here
-• matches the current Flutter desktop focus
-• the project has recent maintainer activity
-• the release includes migration notes and tests
-• this topic has not appeared elsewhere in today's feed
+- Shared terminology in [`docs/terminology.md`](docs/terminology.md).
+- Draft semantic feed rules in [`rfcs/0001-semantic-feed.md`](rfcs/0001-semantic-feed.md).
+- Versioned JSON Schema in [`schemas/v0.1/`](schemas/v0.1/).
+- Conformance fixtures in [`fixtures/v0.1/`](fixtures/v0.1/).
+- Mechanical validation in [`scripts/validate-fixtures.py`](scripts/validate-fixtures.py).
+- Maintainer notes in [`docs/maintainers/`](docs/maintainers/).
 
-Evidence
-release notes · repository activity · dependency metadata
-```
+[`core-rust`](https://github.com/refetch-project/core-rust) contains the deterministic Rust reference implementation, CLI, and Rust contract bindings. Other implementations should bind to the schemas and pass the fixtures here rather than copying Rust-specific assumptions.
 
-Switching to a frontier Lens can reorganize the same source material around novelty, emerging techniques, and important discussions. The source stays the same; the point of view changes.
-
-## The core idea
-
-Refetch models feed generation as an inspectable decision:
+## Contract shape
 
 ```text
-FeedSlate = Select(Rank(Candidates, Lens, Policy, Context))
+FeedSlate = Select(Rank(Candidates, LensProfile, Policy, Context))
 ```
 
-- **Candidates** describe what happened and where it came from.
-- **Lens** expresses the user's current goal.
-- **Policy** defines filters, weights, diversity, and exploration rules.
-- **Context** carries session-level information such as time, seen items, and host preferences.
-- **FeedSlate** contains the selected items, their order, and structured decision traces.
-
-This separation makes every stage replaceable and testable.
-
-## How it works
-
-```mermaid
-flowchart TB
-    S["GitHub · RSS · media sources"] --> A["Source adapters"]
-    A --> C["FeedCandidate"]
-    C --> R["Refetch Core"]
-    N["AnalysisRecord"] --> R
-    L["LensProfile + Policy"] --> R
-    R --> F["FeedSlate + reasons"]
-```
-
-1. An adapter converts source data into a portable `FeedCandidate`.
-2. An analyzer can attach summaries, topics, quality signals, and confidence as an `AnalysisRecord`.
-3. The user or host selects a `LensProfile` for the current task.
-4. Refetch applies scoring, filtering, deduplication, diversity, and exploration policies.
-5. The host receives a `FeedSlate` with structured reasons and evidence references.
-
-## Conceptual model
-
-| Object | Purpose |
-| --- | --- |
-| `FeedCandidate` | A source-neutral envelope containing a subject, a trigger, provenance, timestamps, and source signals |
-| `AnalysisRecord` | Versioned semantic enrichment such as a summary, topics, quality signals, confidence, and provenance |
-| `LensProfile` | A portable description of the user's current goal, interests, weights, filters, and exploration preferences |
-| `RankingDecision` | The score, eligibility result, feature contributions, and evidence-backed reasons for one candidate |
-| `FeedSlate` | The final ordered collection together with slate-level diversity, coverage, and exploration information |
-
-A **subject** is the thing being understood: a repository, release, article, video, issue, pull request, or discussion.
-
-A **trigger** is why that subject is a candidate now: it was published, released, updated, revived, discussed, or surfaced by a source.
-
-That distinction lets Refetch represent both timeless objects and time-sensitive events without flattening every platform into the same kind of post.
-
-## Structured explanations
-
-Explanations are built from the same features and evidence used by the decision engine. A renderer can turn them into natural language while preserving the underlying trace.
-
-```json
-{
-  "candidateId": "github:release:example/tool:v1.4.0",
-  "lensId": "production-ready",
-  "score": 0.87,
-  "reasons": [
-    {
-      "code": "RECENT_STABLE_RELEASE",
-      "contribution": 0.18,
-      "evidenceRefs": ["release:v1.4.0", "repo:activity:30d"]
-    },
-    {
-      "code": "MATCHES_FOCUS_TOPIC",
-      "contribution": 0.14,
-      "evidenceRefs": ["analysis:topic:flutter-desktop"]
-    }
-  ]
-}
-```
-
-This provides a stable foundation for UI explanations, debugging tools, evaluation, and future model-assisted presentation.
-
-## Designed for portable hosts
-
-Refetch keeps the source adapter, analysis provider, decision engine, and user interface behind explicit boundaries.
-
-- **Language-neutral contract:** canonical JSON Schema provides a stable interchange format.
-- **Dart reference engine:** the first implementation targets Flutter hosts and local execution.
-- **Model-independent analysis:** analyzers publish versioned records through a common interface.
-- **Local-first processing:** hosts control storage and decide when external analysis services receive data.
-- **Cross-source semantics:** GitHub and RSS form the first validation pair, followed by media-platform integrations.
-
-## The experience we are building
-
-A useful Refetch-powered feed should help people:
-
-- find meaningful updates earlier;
-- see fewer repeated versions of the same story;
-- switch goals without rebuilding their source list;
-- understand why each item was selected;
-- control how much familiar and exploratory material appears;
-- carry the same Lens across different applications and sources.
-
-## Planned repository layout
+The v0.1 flow is intentionally small and testable:
 
 ```text
-schemas/                         canonical JSON Schema
-packages/refetch_contract/       Dart contract models and codecs
-packages/refetch_core/           scoring, policy, deduplication, and slate selection
-packages/refetch_adapter_github/ GitHub normalization
-packages/refetch_adapter_rss/    RSS and Atom normalization
-packages/refetch_analyzer/       analyzer interfaces and reference adapters
-fixtures/                        portable input and expected-output datasets
-examples/feed_lab/               interactive GitHub + RSS validation host
+validate
+→ eligibility/filtering
+→ feature contributions
+→ deterministic ordering
+→ cluster-constrained selection
+→ typed slate metrics
 ```
 
-The contract and fixtures lead the implementation so that future TypeScript, Rust, Python, Kotlin, and Swift implementations can share behavior instead of only sharing names.
+Every score-affecting `Signal` carries explicit `evidenceRefs`. Every non-zero contribution becomes a structured `RankingReason`. `FeedSlate.generatedAt` comes from `RankRequest.context.generatedAt`, so implementations do not read the clock while ranking.
 
-## First milestones
+## Validate the executable spec
 
-1. Publish the vocabulary, example records, and versioned schema.
-2. Implement deterministic ranking and slate selection in Dart.
-3. Normalize GitHub and RSS data into shared fixtures.
-4. Build Feed Lab with switchable Lenses and visible ranking reasons.
-5. Embed the engine in a Flutter host and validate a media feed.
+Install the Python dependency and run the fixture checks:
+
+```bash
+python3 -m pip install -r requirements.txt
+python3 scripts/validate-fixtures.py
+```
+
+The validator checks schemas, local `$ref` resolution, valid and invalid fixtures, references, expected `FeedSlate` outputs, and observable differences across the three Lens examples.
 
 ## Contributing
 
-Refetch is at the stage where small, concrete examples can shape the architecture. Useful early contributions include:
+Good contributions include:
 
-- GitHub and RSS fixture datasets;
-- Lens examples for real information tasks;
-- ranking and diversity evaluation methods;
-- JSON Schema and Dart model review;
-- explanation UI experiments;
-- adapter prototypes for additional sources.
+- Real feed scenarios with candidate data, evidence, and the desired user-visible explanations.
+- Reviews of the RFC, schemas, and fixture semantics.
+- Additional conformance fixtures that expose ambiguous contract behavior.
+- Implementation feedback from Rust, TypeScript, Dart, or other bindings.
 
-Open an issue with a real feed scenario, a sample input, and the result you would want to receive. Those examples will guide the contract and reference implementation.
-
----
-
-**Refetch Core — your information, organized around your intent.**
+Please keep product limitations and internal failure analysis in RFCs or maintainer docs rather than the README narrative.
