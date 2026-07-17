@@ -1,7 +1,5 @@
 #!/usr/bin/env python3
 import json
-from datetime import datetime
-from urllib.parse import urlparse
 from decimal import Decimal, ROUND_HALF_UP
 from pathlib import Path
 from jsonschema import Draft202012Validator, FormatChecker
@@ -9,6 +7,16 @@ from referencing import Registry, Resource
 ROOT=Path(__file__).resolve().parents[1]; S=ROOT/'schemas/v0.1'; F=ROOT/'fixtures/v0.1'
 ALGORITHM_ID='refetch.rank.baseline.v0.1'
 Q=Decimal('0.000001')
+EXPECTED_ERRORS={
+    'schema', 'duplicateCandidateId', 'duplicateAnalysisId',
+    'duplicateCandidateSignalName', 'duplicateAnalysisSignalName',
+    'duplicateEvidenceId', 'analysisCandidateMissing', 'danglingEvidenceRef',
+    'sourceSignalEvidenceRef', 'signalValuePrecision', 'weightPrecision',
+    'coverageMismatch', 'expectedScoreMismatch',
+}
+
+class SchemaFixtureError(AssertionError):
+    pass
 
 def load(p):
     with open(p, encoding='utf-8') as f: return json.load(f)
@@ -31,24 +39,11 @@ def num(x): return Decimal(str(x))
 
 def schema_check(name,obj):
     errs=list(validators[name].iter_errors(obj))
-    if errs: raise AssertionError('; '.join(e.message for e in errs[:3]))
+    if errs: raise SchemaFixtureError('; '.join(e.message for e in errs[:3]))
 
 def names_unique(items, err):
     names=[s['name'] for s in items]
     if len(names)!=len(set(names)): raise ValueError(err)
-
-def assert_date_time(value):
-    if not isinstance(value, str) or not value.endswith('Z'):
-        raise ValueError('invalidDateTime')
-    try:
-        datetime.fromisoformat(value.replace('Z', '+00:00'))
-    except ValueError as exc:
-        raise ValueError('invalidDateTime') from exc
-
-def assert_uri(value):
-    parsed=urlparse(value)
-    if parsed.scheme not in ('http','https') or not parsed.netloc:
-        raise ValueError('invalidUri')
 
 def candidate_evidence_ids(req, cid):
     ids=set()
@@ -71,22 +66,13 @@ def semantic(req):
     if len(cids)!=len(set(cids)): raise ValueError('duplicateCandidateId')
     aids=[a['id'] for a in req['analysis']]
     if len(aids)!=len(set(aids)): raise ValueError('duplicateAnalysisId')
-    assert_date_time(req['context']['generatedAt'])
     seen_ev=[]
     for c in req['candidates']:
-        assert_date_time(c['trigger']['observedAt'])
-        assert_date_time(c['provenance']['retrievedAt'])
-        assert_uri(c['subject']['url'])
-        for ev in c['evidence']:
-            if 'url' in ev: assert_uri(ev['url'])
         names_unique(c['signals'],'duplicateCandidateSignalName')
         for s in c['signals']: assert_precision(s['value'], 'signalValue')
         if any(not s['name'].startswith('source.') for s in c['signals']): raise ValueError('invalidCandidateSignalNamespace')
         seen_ev += [e['id'] for e in c['evidence']]
     for a in req['analysis']:
-        assert_date_time(a['createdAt'])
-        for ev in a['evidence']:
-            if 'url' in ev: assert_uri(ev['url'])
         names_unique(a['signals'],'duplicateAnalysisSignalName')
         for s in a['signals']: assert_precision(s['value'], 'signalValue')
         if any(not s['name'].startswith('analysis.') for s in a['signals']): raise ValueError('invalidAnalysisSignalNamespace')
@@ -156,7 +142,9 @@ def pool_signature(req):
 def main():
     for name in schemas: Draft202012Validator.check_schema(schemas[name])
     orders=[]; sig=None
-    for p in sorted((F/'valid').glob('*.rank-request.json')):
+    valid_paths=sorted((F/'valid').glob('*.rank-request.json'))
+    invalid_paths=sorted((F/'invalid').glob('*.json'))
+    for p in valid_paths:
         req=load(p); semantic(req)
         ps=pool_signature(req)
         if sig is None: sig=ps
@@ -166,14 +154,19 @@ def main():
         slate=load(exp); validate_expected(req, slate)
         orders.append(tuple(i['candidateId'] for i in slate['items']))
     if len(set(orders)) < 3: raise AssertionError('three Lens outputs must differ')
-    for p in sorted((F/'invalid').glob('*.json')):
+    for p in invalid_paths:
         wrapper=load(p); expected=wrapper['expectedError']; req=wrapper['request']; slate=wrapper.get('slate')
+        if expected not in EXPECTED_ERRORS:
+            raise AssertionError(f'{p}: unknown expectedError {expected}')
         try:
             if slate is None: semantic(req)
             else: validate_expected(req, slate)
         except Exception as e:
-            if expected!='schema' and expected not in str(e): raise AssertionError(f'{p}: expected {expected}, got {e}')
+            if expected=='schema' and not isinstance(e, SchemaFixtureError):
+                raise AssertionError(f'{p}: expected schema error, got {type(e).__name__}: {e}')
+            if expected!='schema' and (isinstance(e, SchemaFixtureError) or expected not in str(e)):
+                raise AssertionError(f'{p}: expected {expected}, got {type(e).__name__}: {e}')
         else:
             raise AssertionError(f'{p}: unexpectedly valid')
-    print('validated schemas, semantic fixtures, recomputed expected outputs, references, metrics, and lens differences')
+    print(f'validated {len(valid_paths)} valid and {len(invalid_paths)} invalid fixtures; recomputed outputs, references, metrics, and lens differences')
 if __name__=='__main__': main()
