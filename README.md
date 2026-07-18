@@ -6,7 +6,7 @@ Refetch Concept is the language-neutral source of truth for Refetch: an open, po
 
 The Rust reference implementation lives in [`refetch-project/core-rust`](https://github.com/refetch-project/core-rust). Rust structs are bindings to this repository's schemas and fixtures; they are not the specification source.
 
-> **Project stage:** Foundation v0.1.2. The v0.1 contract is a draft, executable specification for deterministic feed ranking and slate selection.
+> **Project stage:** Foundation v0.1.3. The v0.1 contract is a draft, executable specification for deterministic feed ranking and slate selection.
 
 ## What Refetch enables
 
