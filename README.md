@@ -1,6 +1,6 @@
 # Refetch Concept
 
-[简体中文](README.zh-CN.md)
+英语 | [简体中文](README.zh-CN.md)
 
 Refetch Concept is the language-neutral source of truth for Refetch: an open, portable foundation for user-directed semantic feeds. It defines the terminology, RFCs, JSON Schema, and conformance fixtures that implementations use to produce explainable `FeedSlate` results.
 

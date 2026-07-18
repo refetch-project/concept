@@ -1,6 +1,6 @@
 # Refetch Concept
 
-[English](README.md)
+[English](README.md) | 简体中文
 
 Refetch Concept 是 Refetch 的语言无关规范源。它定义术语、RFC、JSON Schema 和一致性 fixtures，帮助不同实现生成可解释的 `FeedSlate`。
 
